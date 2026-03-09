@@ -1,6 +1,6 @@
 {
-  "name": "claude-model-switch",
-  "version": "1.0.0",
+  "name": "@xuanyue1024/claude-model-switch",
+  "version": "2.0.1",
   "description": "Claude Code 模型切换工具 - 快速切换不同产商的 Claude 模型",
   "main": "index.js",
   "bin": {

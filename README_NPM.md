@@ -1,4 +1,4 @@
-# Claude Switch
+# Claude Model Switch
 
 Claude Code 模型切换工具 - 快速切换不同产商的 Claude 模型
 
@@ -14,7 +14,7 @@ Claude Code 模型切换工具 - 快速切换不同产商的 Claude 模型
 ### 使用 npm 安装（推荐）
 
 ```bash
-npm install -g claude-model-switch
+npm install -g @xuanyue1024/claude-model-switch
 ```
 
 ### 从源码安装
