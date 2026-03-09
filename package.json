@@ -1,10 +1,10 @@
 {
-  "name": "claude-switch",
+  "name": "claude-model-switch",
   "version": "1.0.0",
   "description": "Claude Code 模型切换工具 - 快速切换不同产商的 Claude 模型",
   "main": "index.js",
   "bin": {
-    "cs": "./bin/index.js"
+    "cms": "./bin/index.js"
   },
   "scripts": {
     "start": "node bin/index.js",
@@ -16,22 +16,23 @@
     "model-switch",
     "api",
     "anthropic",
-    "llm"
+    "llm",
+    "opencode"
   ],
-  "author": "yanghc",
+  "author": "竹林听雨",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/claude-switch.git"
+    "url": "https://github.com/xuanyue1024/claude-model-switch.git"
   },
   "files": [
     "index.js",
     "bin/",
-    "lib/",
-    "config.json.example"
+    "README.md",
+    "LICENSE"
   ],
   "os": [
     "win32",

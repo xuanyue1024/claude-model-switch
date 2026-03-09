@@ -14,7 +14,7 @@ const fs = require('fs');
 // 配置相关
 // ============================================
 
-const CONFIG_DIR = path.join(os.homedir(), '.claude-switch');
+const CONFIG_DIR = path.join(os.homedir(), '.claude-model-switch');
 const CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
 
 /**
@@ -23,7 +23,7 @@ const CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
 function getConfig() {
     if (!fs.existsSync(CONFIG_PATH)) {
         console.log(`\x1b[31m错误: 配置文件不存在: ${CONFIG_PATH}\x1b[0m`);
-        console.log(`\x1b[33m请运行 'cs init' 初始化配置\x1b[0m\n`);
+        console.log(`\x1b[33m请运行 'cms init' 初始化配置\x1b[0m\n`);
         process.exit(1);
     }
 
@@ -73,8 +73,8 @@ function initConfig() {
     console.log(`\x1b[36m========================================\x1b[0m\n`);
     console.log(`\x1b[32m✓ 配置文件已创建: ${CONFIG_PATH}\x1b[0m\n`);
     console.log(`\x1b[33m下一步:\x1b[0m`);
-    console.log(`  1. 编辑配置文件添加你的 API Key`);
-    console.log(`  2. 使用 'cs' 启动 Claude Code\n`);
+    console.log(`  1. 编辑配置文件添加你的 API Key,可用 cms help 查看完整指令`);
+    console.log(`  2. 使用 'cms' 启动 Claude Code\n`);
 }
 
 // ============================================
@@ -121,7 +121,7 @@ const DEFAULT_CONFIG = {
         },
         qwen: {
             name: '通义千问',
-            base_url: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+            base_url: 'https://dashscope.aliyuncms.com/compatible-mode/v1',
             api_key: '',
             models: {
                 opus: 'qwen-max',
@@ -169,41 +169,41 @@ ${colors.cyan('========================================')}
 
 ${colors.green('可用命令:')}
 
-  cs                 - 使用当前配置启动 Claude Code
-  cs help            - 显示此帮助信息
-  cs init            - 初始化配置文件
-  cs list            - 列出所有产商和可用模型
-  cs status          - 显示当前配置状态
-  cs switch <产商>   - 切换到指定产商
-  cs key <产商> <Key>     - 设置产商的 API Key（不提供 Key 则清除）
-  cs url <产商> <URL>     - 设置产商的 Base URL（不提供 URL 则清除）
-  cs models <产商>   - 设置产商的三个模型 ID
-  cs remove <产商>   - 删除指定产商配置
-  cs add <产商>      - 添加新产商(交互式)
-  cs config          - 打开配置文件编辑
+  cms                 - 使用当前配置启动 Claude Code
+  cms help            - 显示此帮助信息
+  cms init            - 初始化配置文件
+  cms list            - 列出所有产商和可用模型
+  cms status          - 显示当前配置状态
+  cms switch <产商>   - 切换到指定产商
+  cms key <产商> <Key>     - 设置产商的 API Key（不提供 Key 则清除）
+  cms url <产商> <URL>     - 设置产商的 Base URL（不提供 URL 则清除）
+  cms models <产商>   - 设置产商的三个模型 ID
+  cms remove <产商>   - 删除指定产商配置
+  cms add <产商>      - 添加新产商(交互式)
+  cms config          - 打开配置文件编辑
 
 ${colors.green('全局配置:')}
 
-  cs key global <Key>   - 设置全局 API Key（不提供 Key 则清除）
-  cs url global <URL>   - 设置全局 Base URL（不提供 URL 则清除）
+  cms key global <Key>   - 设置全局 API Key（不提供 Key 则清除）
+  cms url global <URL>   - 设置全局 Base URL（不提供 URL 则清除）
 
 ${colors.green('快捷命令:')}
 
-  cs s <产商>       - switch 的简写
-  cs k <产商> <Key> - key 的简写
-  cs ls             - list 的简写
+  cms s <产商>       - switch 的简写
+  cms k <产商> <Key> - key 的简写
+  cms ls             - list 的简写
 
 ${colors.green('使用示例:')}
 
-  cs                - 启动 Claude Code
-  cs list           - 查看所有选项
-  cs key deepseek sk-xxx  - 设置 DeepSeek 的 API Key
-  cs key deepseek         - 清除 DeepSeek 的 API Key（使用全局配置）
-  cs url https://api.xxx.com - 设置当前产商的 Base URL
-  cs url                  - 清除产商的 Base URL（使用全局配置）
-  cs switch zhipu   - 切换到智谱AI
-  cs remove myvendor   - 删除产商配置
-  cs models deepseek    - 修改 DeepSeek 的模型配置
+  cms                - 启动 Claude Code
+  cms list           - 查看所有选项
+  cms key deepseek sk-xxx  - 设置 DeepSeek 的 API Key
+  cms key deepseek         - 清除 DeepSeek 的 API Key（使用全局配置）
+  cms url https://api.xxx.com - 设置当前产商的 Base URL
+  cms url                  - 清除产商的 Base URL（使用全局配置）
+  cms switch zhipu   - 切换到智谱AI
+  cms remove myvendor   - 删除产商配置
+  cms models deepseek    - 修改 DeepSeek 的模型配置
 
 ${colors.gray(`配置文件位置: ${CONFIG_PATH}`)}
 `);
@@ -268,7 +268,7 @@ ${colors.yellow('API Key 状态:')}`);
         console.log(colors.green(`  API Key: ${maskApiKey(apiKey)}`));
         console.log(colors.yellow(`  来源: ${currentVendor.api_key ? '产商级' : '全局级'}`));
     } else {
-        console.log(colors.red(`  API Key: 未设置 (请使用 'cs key ${config.current_vendor} <API Key>' 或 'cs key global <API Key>' 设置)`));
+        console.log(colors.red(`  API Key: 未设置 (请使用 'cms key ${config.current_vendor} <API Key>' 或 'cms key global <API Key>' 设置)`));
     }
 
     console.log(`
@@ -291,7 +291,7 @@ function switchVendor(vendorName) {
 
     if (!config.vendors[vendorName]) {
         console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
-        console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
+        console.log(`${colors.yellow("使用 'cms list' 查看可用产商")}\n`);
         return;
     }
 
@@ -306,7 +306,7 @@ function switchVendor(vendorName) {
 
     if (!newVendor.api_key) {
         console.log(`\n${colors.yellow('提示: 请设置 API Key')}`);
-        console.log(colors.gray(`运行: cs key ${vendorName} <your-api-key>`));
+        console.log(colors.gray(`运行: cms key ${vendorName} <your-api-key>`));
     }
     console.log('');
 }
@@ -341,8 +341,8 @@ ${colors.cyan('========================================')}
         }
 
         console.log(colors.yellow('使用方式:'));
-        console.log(colors.white('  设置: cs key <产商|global> <API Key>'));
-        console.log(colors.white('  清除: cs key <产商|global>\n'));
+        console.log(colors.white('  设置: cms key <产商|global> <API Key>'));
+        console.log(colors.white('  清除: cms key <产商|global>\n'));
         return;
     }
 
@@ -370,7 +370,7 @@ ${colors.cyan('========================================')}
     // 处理产商配置
     if (!config.vendors[vendorName]) {
         console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
-        console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
+        console.log(`${colors.yellow("使用 'cms list' 查看可用产商")}\n`);
         return;
     }
 
@@ -417,8 +417,8 @@ ${colors.cyan('========================================')}
         }
 
         console.log(colors.yellow('使用方式:'));
-        console.log(colors.white('  设置: cs url <产商|global> <Base URL>'));
-        console.log(colors.white('  清除: cs url <产商|global>\n'));
+        console.log(colors.white('  设置: cms url <产商|global> <Base URL>'));
+        console.log(colors.white('  清除: cms url <产商|global>\n'));
         return;
     }
 
@@ -446,7 +446,7 @@ ${colors.cyan('========================================')}
     // 处理产商配置
     if (!config.vendors[vendorName]) {
         console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
-        console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
+        console.log(`${colors.yellow("使用 'cms list' 查看可用产商")}\n`);
         return;
     }
 
@@ -471,7 +471,7 @@ async function setModels(args) {
 
     if (args.length < 2) {
         console.log(`\n${colors.red('错误: 请指定产商')}`);
-        console.log(colors.yellow('用法: cs models <产商>\n'));
+        console.log(colors.yellow('用法: cms models <产商>\n'));
         return;
     }
 
@@ -479,7 +479,7 @@ async function setModels(args) {
 
     if (!config.vendors[vendorName]) {
         console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
-        console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
+        console.log(`${colors.yellow("使用 'cms list' 查看可用产商")}\n`);
         return;
     }
 
@@ -631,7 +631,7 @@ ${colors.cyan('========================================')}
         console.log(colors.gray(`Sonnet: ${sonnet.trim()}`));
         console.log(colors.gray(`Haiku: ${haiku.trim()}\n`));
 
-        console.log(colors.yellow(`\n现在可以使用: cs switch ${vendorKey.trim()}\n`));
+        console.log(colors.yellow(`\n现在可以使用: cms switch ${vendorKey.trim()}\n`));
     } catch (err) {
         rl.close();
         throw err;
@@ -646,7 +646,7 @@ function deleteVendor(args) {
 
     if (args.length < 2) {
         console.log(`\n${colors.red('错误: 请指定要删除的产商')}`);
-        console.log(colors.yellow('用法: cs remove <产商>\n'));
+        console.log(colors.yellow('用法: cms remove <产商>\n'));
         return;
     }
 
@@ -654,7 +654,7 @@ function deleteVendor(args) {
 
     if (!config.vendors[vendorName]) {
         console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
-        console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
+        console.log(`${colors.yellow("使用 'cms list' 查看可用产商")}\n`);
         return;
     }
 
@@ -662,7 +662,7 @@ function deleteVendor(args) {
     if (config.current_vendor === vendorName) {
         console.log(`\n${colors.red('错误: 不能删除当前正在使用的产商')}`);
         console.log(`${colors.yellow('请先切换到其他产商')}`);
-        console.log(colors.yellow(`使用: cs switch <其他产商>\n`));
+        console.log(colors.yellow(`使用: cms switch <其他产商>\n`));
         return;
     }
 
@@ -705,8 +705,8 @@ function startClaudeCode() {
     if (!apiKey) {
         console.log(`\n${colors.red('错误: 未设置 API Key')}`);
         console.log(`${colors.yellow('设置方式:')}`);
-        console.log(colors.white(`  产商级: cs key ${config.current_vendor} <your-api-key>`));
-        console.log(colors.white('  全局级: cs key global <your-api-key>'));
+        console.log(colors.white(`  产商级: cms key ${config.current_vendor} <your-api-key>`));
+        console.log(colors.white('  全局级: cms key global <your-api-key>'));
         console.log('');
         process.exit(1);
     }
@@ -715,8 +715,8 @@ function startClaudeCode() {
     if (!baseUrl) {
         console.log(`\n${colors.red('错误: 未设置 Base URL')}`);
         console.log(`${colors.yellow('设置方式:')}`);
-        console.log(colors.white(`  产商级: cs url ${config.current_vendor} <your-base-url>`));
-        console.log(colors.white('  全局级: cs url global <your-base-url>'));
+        console.log(colors.white(`  产商级: cms url ${config.current_vendor} <your-base-url>`));
+        console.log(colors.white('  全局级: cms url global <your-base-url>'));
         console.log('');
         process.exit(1);
     }
@@ -819,8 +819,8 @@ async function main() {
         case 's':
             if (args.length < 2) {
                 console.log(`\n${colors.red('错误: 请指定产商')}`);
-                console.log(colors.yellow('用法: cs switch <产商>'));
-                console.log(colors.yellow("使用 'cs list' 查看可用产商\n"));
+                console.log(colors.yellow('用法: cms switch <产商>'));
+                console.log(colors.yellow("使用 'cms list' 查看可用产商\n"));
                 return;
             }
             switchVendor(args[1]);
@@ -864,7 +864,7 @@ async function main() {
         // 未知命令
         default:
             console.log(`\n${colors.red(`错误: 未知命令 '${command}'`)}`);
-            console.log(colors.yellow("使用 'cs help' 查看可用命令\n"));
+            console.log(colors.yellow("使用 'cms help' 查看可用命令\n"));
     }
 }
 
