@@ -711,6 +711,16 @@ function startClaudeCode() {
         process.exit(1);
     }
 
+    // 检查 API url 是否已设置
+    if (!baseUrl) {
+        console.log(`\n${colors.red('错误: 未设置 Base URL')}`);
+        console.log(`${colors.yellow('设置方式:')}`);
+        console.log(colors.white(`  产商级: cs url ${config.current_vendor} <your-base-url>`));
+        console.log(colors.white('  全局级: cs url global <your-base-url>'));
+        console.log('');
+        process.exit(1);
+    }
+
     console.log(`
 ${colors.cyan('========================================')}
 ${colors.yellow('        启动 Claude Code')}
