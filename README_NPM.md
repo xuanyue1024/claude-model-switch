@@ -67,24 +67,25 @@ cs
 ### 基本命令
 
 ```bash
-cs                 # 使用当前配置启动 Claude Code
-cs help            # 显示帮助信息
-cs init            # 初始化配置文件
-cs list            # 列出所有产商和可用模型
-cs status          # 显示当前配置状态
-cs switch <产商>   # 切换到指定产商
-cs key <产商> <Key>    # 设置产商的 API Key
-cs url <产商> <URL>    # 设置产商的 Base URL
-cs models <产商>    # 设置产商的三个模型 ID
-cs add <产商>      # 添加新产商(交互式)
-cs config          # 打开配置文件编辑
+cs                         # 使用当前配置启动 Claude Code
+cs help                    # 显示帮助信息
+cs init                    # 初始化配置文件
+cs list                    # 列出所有产商和可用模型
+cs status                  # 显示当前配置状态
+cs switch <产商>           # 切换到指定产商
+cs key <产商> [Key]        # 设置或清除产商的 API Key
+cs url <产商> [URL]        # 设置或清除产商的 Base URL
+cs models <产商>           # 设置产商的三个模型 ID
+cs remove <产商>           # 删除指定产商配置
+cs add <产商>              # 添加新产商(交互式)
+cs config                  # 打开配置文件编辑
 ```
 
 ### 全局配置命令
 
 ```bash
-cs key global <Key>  # 设置全局 API Key
-cs url global <URL>  # 设置全局 Base URL
+cs key global [Key]  # 设置或清除全局 API Key
+cs url global [URL]  # 设置或清除全局 Base URL
 ```
 
 ### 快捷命令
@@ -93,6 +94,7 @@ cs url global <URL>  # 设置全局 Base URL
 cs s <产商>       # switch 的简写
 cs k <产商> <Key> # key 的简写
 cs ls             # list 的简写
+cs rm <产商>      # remove 的简写
 ```
 
 ### 使用示例
@@ -110,6 +112,9 @@ cs url global https://api.global-url.com
 # 设置 DeepSeek 的产商级 API Key（优先级高于全局）
 cs key deepseek sk-deepseek-specific-key
 
+# 清除 DeepSeek 的 API Key（将使用全局配置）
+cs key deepseek
+
 # 切换到智谱AI（将使用全局 API Key，因为未设置产商级 key）
 cs s zhipu
 
@@ -118,6 +123,9 @@ cs s deepseek
 
 # 查看 DeepSeek 的模型配置
 cs models deepseek
+
+# 删除自定义产商（不能删除当前正在使用的产商）
+cs rm my-custom-vendor
 
 # 启动 Claude Code
 cs
