@@ -671,18 +671,11 @@ function startClaudeCode() {
     const apiKey = currentVendor.api_key || config.global?.api_key || '';
 
     // 检查 API Key 是否已设置
-    if (!currentVendor.api_key) {
+    if (!apiKey) {
         console.log(`\n${colors.red('错误: 未设置 API Key')}`);
         console.log(`${colors.yellow('设置方式:')}`);
-
-        if (!currentVendor.api_key) {
-            console.log(colors.white(`  产商级: cs key ${config.current_vendor} <your-api-key>`));
-        }
-
-        if (!config.global?.api_key) {
-            console.log(colors.white('  全局级: cs key global <your-api-key>'));
-        }
-
+        console.log(colors.white(`  产商级: cs key ${config.current_vendor} <your-api-key>`));
+        console.log(colors.white('  全局级: cs key global <your-api-key>'));
         console.log('');
         process.exit(1);
     }

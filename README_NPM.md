@@ -74,9 +74,17 @@ cs list            # 列出所有产商和可用模型
 cs status          # 显示当前配置状态
 cs switch <产商>   # 切换到指定产商
 cs key <产商> <Key>    # 设置产商的 API Key
+cs url <产商> <URL>    # 设置产商的 Base URL
 cs models <产商>    # 设置产商的三个模型 ID
 cs add <产商>      # 添加新产商(交互式)
 cs config          # 打开配置文件编辑
+```
+
+### 全局配置命令
+
+```bash
+cs key global <Key>  # 设置全局 API Key
+cs url global <URL>  # 设置全局 Base URL
 ```
 
 ### 快捷命令
@@ -93,11 +101,20 @@ cs ls             # list 的简写
 # 初始化配置
 cs init
 
-# 设置 DeepSeek 的 API Key
-cs key deepseek sk-your-api-key-here
+# 设置全局 API Key（所有产商通用）
+cs key global sk-your-global-api-key
 
-# 切换到智谱AI
+# 设置全局 Base URL（所有产商通用）
+cs url global https://api.global-url.com
+
+# 设置 DeepSeek 的产商级 API Key（优先级高于全局）
+cs key deepseek sk-deepseek-specific-key
+
+# 切换到智谱AI（将使用全局 API Key，因为未设置产商级 key）
 cs s zhipu
+
+# 切换到 DeepSeek（将使用产商级 API Key）
+cs s deepseek
 
 # 查看 DeepSeek 的模型配置
 cs models deepseek
@@ -113,6 +130,10 @@ cs
 ```json
 {
   "current_vendor": "anthropic",
+  "global": {
+    "base_url": "",
+    "api_key": ""
+  },
   "vendors": {
     "anthropic": {
       "name": "Anthropic官方",
@@ -127,6 +148,18 @@ cs
   }
 }
 ```
+
+## 配置优先级
+
+配置的优先级顺序：
+1. **产商配置** - 优先使用产商级别的 API Key 和 Base URL
+2. **全局配置** - 如果产商未配置，则使用全局配置
+3. **未配置** - 如果都没有配置，启动时会提示需要配置
+
+例如：
+- 如果 `anthropic` 产商配置了 API Key，则使用产商级配置
+- 如果 `zhipu` 产商未配置 API Key，但全局配置了，则使用全局配置
+- 如果都没有配置，启动时会报错提示需要配置
 
 ## 预设产商
 
