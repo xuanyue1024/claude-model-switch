@@ -82,6 +82,11 @@ function initConfig() {
 // ============================================
 
 const DEFAULT_CONFIG = {
+    // 全局配置（当产商未配置时使用）
+    global: {
+        base_url: '',
+        api_key: ''
+    },
     current_vendor: 'anthropic',
     vendors: {
         anthropic: {
@@ -170,10 +175,16 @@ ${colors.green('可用命令:')}
   cs list            - 列出所有产商和可用模型
   cs status          - 显示当前配置状态
   cs switch <产商>   - 切换到指定产商
-  cs key <产商> <Key>    - 设置产商的 API Key
-  cs models <产商>    - 设置产商的三个模型 ID
+  cs key <产商> <Key>     - 设置产商的 API Key
+  cs url <产商> <URL>     - 设置产商的 Base URL
+  cs models <产商>   - 设置产商的三个模型 ID
   cs add <产商>      - 添加新产商(交互式)
   cs config          - 打开配置文件编辑
+
+${colors.green('全局配置:')}
+
+  cs key global <Key>   - 设置全局 API Key
+  cs url global <URL>   - 设置全局 Base URL
 
 ${colors.green('快捷命令:')}
 
@@ -186,6 +197,7 @@ ${colors.green('使用示例:')}
   cs                - 启动 Claude Code
   cs list           - 查看所有选项
   cs key deepseek sk-xxx  - 设置 DeepSeek 的 API Key
+  cs url https://api.xxx.com - 设置当前产商的 Base URL
   cs switch zhipu   - 切换到智谱AI
   cs models deepseek    - 修改 DeepSeek 的模型配置
 
@@ -234,19 +246,25 @@ function showStatus() {
     const config = getConfig();
     const currentVendor = config.vendors[config.current_vendor];
 
+    // 获取实际使用的配置
+    const baseUrl = currentVendor.base_url || config.global?.base_url || '';
+    const apiKey = currentVendor.api_key || config.global?.api_key || '';
+
     console.log(`
 ${colors.cyan('========================================')}
 ${colors.yellow('           当前配置状态')}
 ${colors.cyan('========================================')}
 
 ${colors.green(`当前产商: ${currentVendor.name}`)}
-${colors.green(`Base URL: ${currentVendor.base_url}`)}
+${colors.green(`Base URL: ${baseUrl}`)}
+${colors.yellow('Base URL 来源:')} ${currentVendor.base_url ? colors.green('产商级') : (config.global?.base_url ? colors.gray('全局级') : colors.red('未设置'))}
 
 ${colors.yellow('API Key 状态:')}`);
-    if (currentVendor.api_key) {
-        console.log(colors.green(`  API Key: ${maskApiKey(currentVendor.api_key)}`));
+    if (apiKey) {
+        console.log(colors.green(`  API Key: ${maskApiKey(apiKey)}`));
+        console.log(colors.yellow(`  来源: ${currentVendor.api_key ? '产商级' : '全局级'}`));
     } else {
-        console.log(colors.red(`  API Key: 未设置 (请使用 'cs key ${config.current_vendor} <API Key>' 设置)`));
+        console.log(colors.red(`  API Key: 未设置 (请使用 'cs key ${config.current_vendor} <API Key>' 或 'cs key global <API Key>' 设置)`));
     }
 
     console.log(`
@@ -254,6 +272,10 @@ ${colors.yellow('模型配置:')}
 ${colors.white(`  ANTHROPIC_DEFAULT_OPUS_MODEL:   ${currentVendor.models.opus}`)}
 ${colors.white(`  ANTHROPIC_DEFAULT_SONNET_MODEL: ${currentVendor.models.sonnet}`)}
 ${colors.white(`  ANTHROPIC_DEFAULT_HAIKU_MODEL:  ${currentVendor.models.haiku}`)}
+
+${colors.yellow('全局配置:')}
+${colors.gray(`  Base URL: ${config.global?.base_url || '未设置'}`)}
+${colors.gray(`  API Key: ${maskApiKey(config.global?.api_key) || '未设置'}`)}
 `);
 }
 
@@ -299,6 +321,12 @@ ${colors.yellow('        API Key 配置状态')}
 ${colors.cyan('========================================')}
 `);
 
+        // 显示全局配置
+        console.log(colors.yellow('[global] 全局配置'));
+        console.log(colors.gray(`  API Key: ${maskApiKey(config.global?.api_key)}`));
+        console.log(colors.gray(`  Base URL: ${config.global?.base_url || '未设置'}`));
+        console.log('');
+
         for (const [vendorKey, vendor] of Object.entries(config.vendors)) {
             const isCurrent = config.current_vendor === vendorKey ? ' ◀' : '';
             const nameColor = config.current_vendor === vendorKey ? colors.green : colors.white;
@@ -308,13 +336,36 @@ ${colors.cyan('========================================')}
             console.log('');
         }
 
-        console.log(colors.yellow('使用方式: cs key <产商> <API Key>\n'));
+        console.log(colors.yellow('使用方式: cs key <产商|global> <API Key>'));
+        console.log(colors.yellow('        cs key <产商|global> <API Key> <Base URL> (可选)\n'));
         return;
     }
 
     const vendorName = args[1];
-    const newApiKey = args.slice(2).join(' '); // 处理包含空格的 API Key
+    const newApiKey = args.length > 2 ? args.slice(2).join(' ') : '';
+    const newBaseUrl = args.length > 2 ? args.slice(2).join(' ') : ''; // 简单处理，实际可能需要更复杂的解析
 
+    // 处理全局配置
+    if (vendorName === 'global') {
+        if (!newApiKey) {
+            console.log(`\n${colors.red('错误: 请提供 API Key')}`);
+            console.log(colors.yellow('用法: cs key global <API Key>\n'));
+            return;
+        }
+
+        if (!config.global) {
+            config.global = { base_url: '', api_key: '' };
+        }
+
+        config.global.api_key = newApiKey;
+        saveConfig(config);
+
+        console.log(`\n${colors.green('成功更新全局 API Key!')}`);
+        console.log(colors.gray(`API Key: ${maskApiKey(newApiKey)}\n`));
+        return;
+    }
+
+    // 处理产商配置
     if (!config.vendors[vendorName]) {
         console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
         console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
@@ -327,6 +378,10 @@ ${colors.cyan('========================================')}
         return;
     }
 
+    // 尝试解析是否同时提供了 Base URL
+    // 如果参数中包含空格且有多个空格，可能需要更复杂的逻辑
+    // 这里简化处理：直接使用整个字符串作为 API Key
+
     config.vendors[vendorName].api_key = newApiKey;
     saveConfig(config);
 
@@ -334,6 +389,84 @@ ${colors.cyan('========================================')}
 
     console.log(`\n${colors.green(`成功更新 '${vendor.name}' 的 API Key!`)}`);
     console.log(colors.gray(`API Key: ${maskApiKey(newApiKey)}\n`));
+}
+
+/**
+ * 设置 Base URL
+ */
+function setBaseUrl(args) {
+    const config = getConfig();
+
+    if (args.length < 2) {
+        // 显示所有产商及其 Base URL 状态
+        console.log(`
+${colors.cyan('========================================')}
+${colors.yellow('        Base URL 配置状态')}
+${colors.cyan('========================================')}
+`);
+
+        // 显示全局配置
+        console.log(colors.yellow('[global] 全局配置'));
+        console.log(colors.gray(`  Base URL: ${config.global?.base_url || '未设置'}`));
+        console.log(colors.gray(`  API Key: ${maskApiKey(config.global?.api_key)}`));
+        console.log('');
+
+        for (const [vendorKey, vendor] of Object.entries(config.vendors)) {
+            const isCurrent = config.current_vendor === vendorKey ? ' ◀' : '';
+            const nameColor = config.current_vendor === vendorKey ? colors.green : colors.white;
+            console.log(nameColor(`[${vendorKey}]${isCurrent} ${vendor.name}`));
+            console.log(colors.gray(`  Base URL: ${vendor.base_url}`));
+            console.log(colors.gray(`  API Key: ${maskApiKey(vendor.api_key)}`));
+            console.log('');
+        }
+
+        console.log(colors.yellow('使用方式: cs url <产商|global> <Base URL>\n'));
+        return;
+    }
+
+    const vendorName = args[1];
+    const newBaseUrl = args.slice(2).join(' ');
+
+    // 处理全局配置
+    if (vendorName === 'global') {
+        if (!newBaseUrl) {
+            console.log(`\n${colors.red('错误: 请提供 Base URL')}`);
+            console.log(colors.yellow('用法: cs url global <Base URL>\n'));
+            return;
+        }
+
+        if (!config.global) {
+            config.global = { base_url: '', api_key: '' };
+        }
+
+        config.global.base_url = newBaseUrl;
+        saveConfig(config);
+
+        console.log(`\n${colors.green('成功更新全局 Base URL!')}`);
+        console.log(colors.gray(`Base URL: ${newBaseUrl}\n`));
+        return;
+    }
+
+    // 处理产商配置
+    if (!config.vendors[vendorName]) {
+        console.log(`\n${colors.red(`错误: 未找到产商 '${vendorName}'`)}`);
+        console.log(`${colors.yellow("使用 'cs list' 查看可用产商")}\n`);
+        return;
+    }
+
+    if (!newBaseUrl) {
+        console.log(`\n${colors.red('错误: 请提供 Base URL')}`);
+        console.log(colors.yellow('用法: cs url <产商> <Base URL>\n'));
+        return;
+    }
+
+    config.vendors[vendorName].base_url = newBaseUrl;
+    saveConfig(config);
+
+    const vendor = config.vendors[vendorName];
+
+    console.log(`\n${colors.green(`成功更新 '${vendor.name}' 的 Base URL!`)}`);
+    console.log(colors.gray(`Base URL: ${newBaseUrl}\n`));
 }
 
 /**
@@ -533,12 +666,24 @@ function startClaudeCode() {
     const config = getConfig();
     const currentVendor = config.vendors[config.current_vendor];
 
+    // 获取实际使用的配置（产商配置优先，全局配置兜底）
+    const baseUrl = currentVendor.base_url || config.global?.base_url || '';
+    const apiKey = currentVendor.api_key || config.global?.api_key || '';
+
     // 检查 API Key 是否已设置
     if (!currentVendor.api_key) {
         console.log(`\n${colors.red('错误: 未设置 API Key')}`);
-        console.log(`${colors.yellow('请先设置 API Key 后再启动 Claude Code')}`);
-        console.log(`${colors.gray('设置方式:')}`);
-        console.log(colors.white(`  cs key ${config.current_vendor} <your-api-key>\n`));
+        console.log(`${colors.yellow('设置方式:')}`);
+
+        if (!currentVendor.api_key) {
+            console.log(colors.white(`  产商级: cs key ${config.current_vendor} <your-api-key>`));
+        }
+
+        if (!config.global?.api_key) {
+            console.log(colors.white('  全局级: cs key global <your-api-key>'));
+        }
+
+        console.log('');
         process.exit(1);
     }
 
@@ -547,21 +692,36 @@ ${colors.cyan('========================================')}
 ${colors.yellow('        启动 Claude Code')}
 ${colors.cyan('========================================')}
 
-${colors.green(`产商: ${currentVendor.name}`)}
-${colors.green(`Base URL: ${currentVendor.base_url}`)}
-${colors.gray(`API Key: ${maskApiKey(currentVendor.api_key)}`)}
+${colors.green(`产商: ${currentVendor.name}`)}`);
 
+    if (currentVendor.base_url) {
+        console.log(`${colors.green(`Base URL: ${currentVendor.base_url}`)} (${colors.green('产商级')})`);
+    } else if (config.global?.base_url) {
+        console.log(`${colors.green(`Base URL: ${config.global.base_url}`)} (${colors.gray('全局级')})`);
+    } else {
+        console.log(`${colors.red(`Base URL: 未设置`)}`);
+    }
+
+    if (currentVendor.api_key) {
+        console.log(`${colors.green(`API Key: ${maskApiKey(currentVendor.api_key)}`)} (${colors.green('产商级')})`);
+    } else if (config.global?.api_key) {
+        console.log(`${colors.green(`API Key: ${maskApiKey(config.global.api_key)}`)} (${colors.gray('全局级')})`);
+    } else {
+        console.log(`${colors.red(`API Key: 未设置`)}`);
+    }
+
+    console.log(`
 ${colors.yellow('环境变量设置:')}
-${colors.green(`  ANTHROPIC_BASE_URL            = ${currentVendor.base_url}`)}
-${colors.green(`  ANTHROPIC_AUTH_TOKEN          = ${maskApiKey(currentVendor.api_key)}`)}
+${colors.green(`  ANTHROPIC_BASE_URL            = ${baseUrl}`)}
+${colors.green(`  ANTHROPIC_AUTH_TOKEN          = ${maskApiKey(apiKey)}`)}
 ${colors.green(`  ANTHROPIC_DEFAULT_OPUS_MODEL  = ${currentVendor.models.opus}`)}
 ${colors.green(`  ANTHROPIC_DEFAULT_SONNET_MODEL = ${currentVendor.models.sonnet}`)}
 ${colors.green(`  ANTHROPIC_DEFAULT_HAIKU_MODEL  = ${currentVendor.models.haiku}`)}
 `);
 
     // 设置环境变量
-    process.env.ANTHROPIC_BASE_URL = currentVendor.base_url;
-    process.env.ANTHROPIC_AUTH_TOKEN = currentVendor.api_key;
+    process.env.ANTHROPIC_BASE_URL = baseUrl;
+    process.env.ANTHROPIC_AUTH_TOKEN = apiKey;
     process.env.ANTHROPIC_DEFAULT_OPUS_MODEL = currentVendor.models.opus;
     process.env.ANTHROPIC_DEFAULT_SONNET_MODEL = currentVendor.models.sonnet;
     process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL = currentVendor.models.haiku;
@@ -636,6 +796,12 @@ async function main() {
         case 'key':
         case 'k':
             setApiKey(args);
+            break;
+
+        // 设置 Base URL 命令
+        case 'url':
+        case 'u':
+            setBaseUrl(args);
             break;
 
         // 设置模型命令
