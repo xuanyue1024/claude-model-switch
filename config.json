@@ -1,0 +1,57 @@
+/**
+ * Claude 模型切换工具配置文件
+ * 用于配置不同产商的 API 信息，配合 Claude Code 使用
+ *
+ * Claude Code 所需环境变量:
+ *   ANTHROPIC_BASE_URL - API 地址
+ *   ANTHROPIC_AUTH_TOKEN - API Key
+ *   ANTHROPIC_DEFAULT_OPUS_MODEL - Opus 模型 ID
+ *   ANTHROPIC_DEFAULT_SONNET_MODEL - Sonnet 模型 ID
+ *   ANTHROPIC_DEFAULT_HAIKU_MODEL - Haiku 模型 ID
+ */
+
+{
+  "current_vendor": "anthropic",
+  "vendors": {
+    "anthropic": {
+      "name": "Anthropic官方",
+      "base_url": "https://api.anthropic.com",
+      "api_key": "",
+      "models": {
+        "opus": "claude-opus-4-6",
+        "sonnet": "claude-sonnet-4-6",
+        "haiku": "claude-haiku-4-5-20251001"
+      }
+    },
+    "deepseek": {
+      "name": "DeepSeek",
+      "base_url": "https://api.deepseek.com",
+      "api_key": "",
+      "models": {
+        "opus": "deepseek-r1",
+        "sonnet": "deepseek-chat",
+        "haiku": "deepseek-coder"
+      }
+    },
+    "zhipu": {
+      "name": "智谱AI",
+      "base_url": "https://open.bigmodel.cn/api/paas",
+      "api_key": "",
+      "models": {
+        "opus": "glm-4.7",
+        "sonnet": "glm-4",
+        "haiku": "glm-3-turbo"
+      }
+    },
+    "qwen": {
+      "name": "通义千问",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "api_key": "",
+      "models": {
+        "opus": "qwen-max",
+        "sonnet": "qwen-plus",
+        "haiku": "qwen-turbo"
+      }
+    }
+  }
+}
