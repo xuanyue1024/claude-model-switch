@@ -208,9 +208,9 @@ ${colors.cyan('========================================')}
     for (const [vendorKey, vendor] of Object.entries(config.vendors)) {
         const isCurrent = config.current_vendor === vendorKey ? ' ◀ 当前' : '';
 
-        // 显示产商名称
+        // 显示产商名称和 key
         const nameColor = config.current_vendor === vendorKey ? colors.green : colors.white;
-        console.log(nameColor(`【${vendor.name}】${isCurrent}`));
+        console.log(nameColor(`【${vendor.name}】(key: ${vendorKey})${isCurrent}`));
 
         // 显示 API Key 状态
         console.log(colors.gray(`  API Key: ${maskApiKey(vendor.api_key)}`));
@@ -304,6 +304,7 @@ ${colors.cyan('========================================')}
             const nameColor = config.current_vendor === vendorKey ? colors.green : colors.white;
             console.log(nameColor(`[${vendorKey}]${isCurrent} ${vendor.name}`));
             console.log(colors.gray(`  API Key: ${maskApiKey(vendor.api_key)}`));
+            console.log(colors.gray(`  Base URL: ${vendor.base_url}`));
             console.log('');
         }
 
